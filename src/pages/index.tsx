@@ -1,12 +1,15 @@
-/* interface HomeProps {
-  count: number;
-} */
+interface HomeProps {
+  poolCount: number;
+  guessCount: number;
+  userCount: number;
+}
 
 import Image from "next/image";
 import appPreviewImg from "../assets/app-nlw-copa-preview.png";
 import logoImg from "../assets/logo.svg";
 import avatarImg from "../assets/users-avatar-example.png";
 import checkImg from "../assets/icon-check.svg";
+import { api } from "../lib/axios";
 
 export default function Home(props: HomeProps) {
   return (
@@ -19,7 +22,7 @@ export default function Home(props: HomeProps) {
         <div className="flex items-center mt-10 gap-2">
           <Image src={avatarImg} alt="Logo Copa" quality={100} />
           <strong className="text-gray-100 text-xl ">
-            <span className="text-ignite-500">+12.592</span>
+            <span className="text-ignite-500 pr-3">+{props.userCount}</span>
             pessoas já estão usando
           </strong>
         </div>
@@ -48,17 +51,21 @@ export default function Home(props: HomeProps) {
           <div className="flex gap-6">
             <Image src={checkImg} alt="Logo Copa" quality={100} />
             <div className="flex flex-col">
-              <span className="font-bold text-2xl text-white">+2.034</span>
+              <span className="font-bold text-2xl text-white">
+                +{props.poolCount}
+              </span>
               <span className="text-white font-semibolde">Bolões criados</span>
             </div>
           </div>
 
-          <div className="w-px h-14 bg-gray-600"/>
+          <div className="w-px h-14 bg-gray-600" />
 
           <div className="flex gap-6">
             <Image src={checkImg} alt="Logo Copa" quality={100} />
             <div className="flex flex-col">
-              <span className="font-bold text-2xl text-white">+192.847</span>
+              <span className="font-bold text-2xl text-white">
+                +{props.guessCount}
+              </span>
               <span className="text-white font-semibolde">
                 Palpites enviados
               </span>
@@ -72,13 +79,19 @@ export default function Home(props: HomeProps) {
   );
 }
 
-/* export const getServerSideProps = async () => {
-  const res = await fetch("http://localhost:3333/pools/count");
-  const data = await res.json();
+export const getServerSideProps = async () => {
+  const [poolCountResponse, guessCountResponse, userCountResponse] =
+    await Promise.all([
+      api.get("pools/count"),
+      api.get("guesses/count"),
+      api.get("users/count"),
+    ]);
 
   return {
     props: {
-      count: data.count,
+      poolCount: poolCountResponse.data.count,
+      guessCount: guessCountResponse.data.count,
+      userCount: userCountResponse.data.count,
     },
   };
-}; */
+};
